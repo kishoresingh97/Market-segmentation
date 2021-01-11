@@ -1,0 +1,115 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+```{r}
+dataset = read.csv("E:/college docs/Customer segmentation/customer-segmentation-dataset/Mall_Customers.csv", header = T)
+
+
+str(dataset)
+```
+
+```{r}
+summary(dataset$Age)
+summary(dataset$Annual.Income..k..)
+```
+
+```{r}
+sd(dataset$Age)
+head(dataset)
+```
+```{r}
+table(dataset$Gender)
+```
+
+
+```{r}
+library(ggplot2)
+a=table(dataset$Gender)
+a
+barplot(a,main = "Barplot for gender", xlab = "Gender", ylab="count", col=rainbow(2), legend = row.names(a) )
+```
+```{r}
+pct = round(a*100/sum(a))
+
+pct
+lbls= paste(c("Female","Male"),pct , "%", sep = " ")
+lbls
+library(plotrix)
+pie3D(a, labels = lbls,main ="Pie chart for gender", col = c('orange','green'))
+
+```
+```{r}
+summary(dataset$Age)
+sd(dataset$Age)
+hist(dataset$Age, col = 'orange', labels = T, border = 'black',main="Hostogram for age", xlab = "Age",ylab = "Count", ylim=c(0,40))
+
+ggplot(dataset)+ geom_histogram(aes(Age), fill="#006050", col="#ffffff", bins = 50)+ ggtitle("histogram from age")
+```
+```{r}
+boxplot(dataset$Age, col="yellow")
+ggplot(dataset)+ geom_boxplot(aes(Age), fill="#005570")+ggtitle("Age boxplot")
+```
+
+```{r}
+summary(dataset$Annual.Income..k..)
+sd(dataset$Annual.Income..k..)
+ggplot(dataset)+ geom_histogram(aes(Annual.Income..k..), col="#ffffff", fill="#ff5566", bins=20)+ ggtitle("Histogram for annual income")
+```
+
+
+```{r}
+
+ggplot(dataset)+ geom_boxplot(aes(Annual.Income..k..), fill="#ff0066")+ ggtitle("Boxplot for annual income")
+```
+```{r}
+ggplot(dataset)+ geom_density(aes(Annual.Income..k..), fill="#006050", col="#ffffff")+ ggtitle("Annual income density plot")+xlab("Annual Income")+ylab("Density")
+```
+
+```{r}
+summary(dataset$Spending.Score..1.100.)
+ggplot(dataset)+ geom_boxplot(aes(Spending.Score..1.100.), fill="#554684")+ ggtitle("Boxplot for spending score")
+```
+
+
+```{r}
+summary(dataset$Spending.Score..1.100.)
+ggplot(dataset)+ geom_histogram(aes(Spending.Score..1.100.), fill="597812", col="#ffffff", bins = 50) 
+rm(y)
+hist(dataset$Spending.Score..1.100., labels = T, col = "#784691", main="Histogram for spending score", xlab = "Score",ylab = "frequency", ylim=c(0,50))
+```
+# summary 
+gender = female 54% | male 44%
+age = 30-40
+income
+score = 40-50
+
+```{r}
+#K means clusturing 
+library(NbClust)
+
+k = NbClust(dataset[,3:5],distance = "euclidean", min.nc = 3,max.nc = 10, method = "kmeans")
+```
+k = 6
+```{r}
+k6=kmeans(dataset[,3:5],6,iter.max = 100, nstart = 50, algorithm = "Lloyd")
+k6
+```
+
+```{r}
+k6$centers
+ggplot(dataset,aes(Annual.Income..k..,Spending.Score..1.100.), col=as.factor(k6$centers))+ geom_point(aes(col=as.factor(k6$cluster))) + ggtitle("segemenation of mall customers",subtitle = "using kmeans clustering") + scale_color_discrete(name=" ", labels=c("cluster 1","cluster 2","cluster 3","cluster 4","cluster 5","cluster 6"))
+```
+
+```{r}
+
+ggplot(dataset, aes(Annual.Income..k.., Age))+ geom_point(aes(col= as.factor(k6$cluster)))+ scale_color_discrete(name=" ", labels=c("cluster 1","cluster 2","cluster 3","cluster 4","cluster 5","cluster 6"))
+
+
+```
+
+```{r}
+table( dataset$CustomerID, k6$cluster)
+```
+
